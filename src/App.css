@@ -1,0 +1,12 @@
+.input-time, .total {
+  display: flex;
+}
+
+.time {
+  display: flex;
+  align-items: center;
+}
+
+p {
+  margin: 0;
+}
