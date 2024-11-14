@@ -5,14 +5,24 @@ export const App = () => {
   const [title, setTitle] = useState("");
   const [time, setTime] = useState(0);
   const [records, setRecords] = useState([]);
+  const [error, setError] = useState("");
+  const totalTime = records.reduce((acc, record) => acc + record.time, 0);
 
   const onChangeTitle = (event) => setTitle(event.target.value);
   const onChangeTime = (event) => setTime(Number(event.target.value));
 
   const onClickRegistration = () => {
-    const newRecords = [...records, {title, time}];
+    if (title === "" || time === 0) {
+      setError("学習内容と学習時間は必須です。");
+      return;
+    }
+    const newRecords = [...records, { title, time }];
     setRecords(newRecords);
+    setTitle("");
+    setTime(0);
+    setError(""); // 入力が正しい場合はエラーメッセージをクリア
   };
+
 
   return (
     <>
@@ -23,7 +33,7 @@ export const App = () => {
     </div>
     <div className='time'>
       <label>学習時間</label>
-      <input type='number' min={0} placeholder='0' value={time} onChange={onChangeTime}/>
+      <input type='number' min={1} placeholder='0' value={time} onChange={onChangeTime}/>
       <p>時間</p>
     </div>
     <div>
@@ -32,11 +42,12 @@ export const App = () => {
         <p>入力されている時間:{time}</p>
         <p>時間</p>
       </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <button onClick={onClickRegistration}>登録</button>
     </div>
     <div className='total'>
       <p>合計時間：</p>
-      <p> / 1000(h)</p>
+      <p> {totalTime}/ 1000(h)</p>
     </div>
     <ul>
       {records.map((record, index) => (
