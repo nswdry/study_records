@@ -7,7 +7,7 @@ export const App = () => {
   const [records, setRecords] = useState([]);
 
   const onChangeTitle = (event) => setTitle(event.target.value);
-  const onChangeTime = (event) => setTime(event.target.value);
+  const onChangeTime = (event) => setTime(Number(event.target.value));
 
   const onClickRegistration = () => {
     const newRecords = [...records, {title, time}];
@@ -39,20 +39,13 @@ export const App = () => {
       <p> / 1000(h)</p>
     </div>
     <ul>
-      <li>
-        <p></p>
-      </li>
-    </ul>
-    {/* <ul>
-      {records.map((study) => (
-        <li key={study}>
-          <div className='list-row'>
-            <p>学習内容:{record.title}</p>
-            <p>学習時間:{record.time}</p>
-          </div>
+      {records.map((record, index) => (
+        <li key={index}>
+          <p>学習内容: {record.title}</p>
+          <p>学習時間: {record.time} 時間</p>
         </li>
-        ))}
-    </ul> */}
+      ))}
+    </ul>
   </>
   );
 };
