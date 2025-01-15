@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from "react";
+import { getAllRecords, addTodo, deleteTodo } from "../utils/supabaseFunctions";
 import './App.css'
 
 export const App = () => {
