@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
-import { getAllRecords, addTodo, deleteTodo } from "../utils/supabaseFunctions";
 import './App.css'
+import { BrowserRouter } from "react-router-dom";
+// Supabaseを利用する
+import { createClient } from "@supabase/supabase-js";
+// Supabaseに接続
+const supabase = createClient (
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export const App = () => {
   const [title, setTitle] = useState("");
@@ -26,7 +33,7 @@ export const App = () => {
 
 
   return (
-    <>
+    <BrowserRouter>
     <h1>学習記録一覧</h1>
     <div>
       <label>学習内容</label>
@@ -58,6 +65,6 @@ export const App = () => {
         </li>
       ))}
     </ul>
-  </>
+  </BrowserRouter>
   );
 };
