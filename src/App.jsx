@@ -1,62 +1,74 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { getStudyRecords, insertStudyRecord } from "./SupabaseService";
+import Header from "./components/Header";
+import InputForm from "./components/InputForm";
+import TotalTimeDisplay from "./components/TotalTimeDisplay";
+import StudyRecordList from "./components/StudyRecordList";
+import "./App.css";
 
 export const App = () => {
   const [title, setTitle] = useState("");
   const [time, setTime] = useState(0);
-  const [records, setRecords] = useState([]);
+  const [studyRecords, setStudyRecords] = useState([]);
   const [error, setError] = useState("");
-  const totalTime = records.reduce((acc, record) => acc + record.time, 0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onChangeTitle = (event) => setTitle(event.target.value);
-  const onChangeTime = (event) => setTime(Number(event.target.value));
+  const totalTime = studyRecords.reduce((acc, record) => acc + record.time, 0);
 
-  const onClickRegistration = () => {
+ const fetchStudyRecords = async () => {
+    setIsLoading(true); // ローディング状態を開始
+    const data = await getStudyRecords(); // Supabaseからデータを取得
+    if (data) {
+      setStudyRecords(data); // データを状態にセット
+    }
+    setIsLoading(false); // ローディング状態を終了
+  };
+
+  // 初回レンダリング時にデータ取得
+  useEffect(() => {
+    fetchStudyRecords();
+  }, []);
+
+
+  const handleRegistration = async () => {
     if (title === "" || time === 0) {
       setError("学習内容と学習時間は必須です。");
       return;
     }
-    const newRecords = [...records, { title, time }];
-    setRecords(newRecords);
-    setTitle("");
-    setTime(0);
-    setError(""); // 入力が正しい場合はエラーメッセージをクリア
+
+    const newRecord = { title, time };
+    const data = await insertStudyRecord(newRecord);
+    if (data) {
+      setStudyRecords((prevRecords) => [...prevRecords, ...data]);
+      setTitle("");
+      setTime(0);
+      setError("");
+    } else {
+      setError("データの登録に失敗しました。");
+    }
   };
 
-
   return (
-    <>
-    <h1>学習記録一覧</h1>
-    <div>
-      <label>学習内容</label>
-      <input type='text' value={title} onChange={onChangeTitle}/>
-    </div>
-    <div className='time'>
-      <label>学習時間</label>
-      <input type='number' min={1} placeholder='0' value={time} onChange={onChangeTime}/>
-      <p>時間</p>
-    </div>
-    <div>
-    <p>入力されている学習内容:{title}</p>
-      <div className='input-time'>
-        <p>入力されている時間:{time}</p>
-        <p>時間</p>
-      </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button onClick={onClickRegistration}>登録</button>
-    </div>
-    <div className='total'>
-      <p>合計時間：</p>
-      <p> {totalTime}/ 1000(h)</p>
-    </div>
-    <ul>
-      {records.map((record, index) => (
-        <li key={index}>
-          <p>学習内容: {record.title}</p>
-          <p>学習時間: {record.time} 時間</p>
-        </li>
-      ))}
-    </ul>
-  </>
+    <BrowserRouter>
+      <Header />
+      <InputForm
+        title={title}
+        time={time}
+        error={error}
+        onTitleChange={(e) => setTitle(e.target.value)}
+        onTimeChange={(e) => setTime(Number(e.target.value))}
+        onRegister={handleRegistration}
+      />
+
+      {isLoading ? (
+        <div className="loading">Loading...</div>
+      ) : (
+        <>
+          <TotalTimeDisplay totalTime={totalTime} />
+          <StudyRecordList studyRecords={studyRecords} />
+        </>
+      )}
+    </BrowserRouter>
   );
 };
