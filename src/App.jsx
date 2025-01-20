@@ -12,13 +12,13 @@ export const App = () => {
   const [time, setTime] = useState(0);
   const [studyRecords, setStudyRecords] = useState([]);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // ローディング状態
 
   const totalTime = studyRecords.reduce((acc, record) => acc + record.time, 0);
 
- const fetchStudyRecords = async () => {
+  const fetchStudyRecords = async () => {
     setIsLoading(true); // ローディング状態を開始
-    const data = await getStudyRecords(); // Supabaseからデータを取得
+    const data = await getStudyRecords();
     if (data) {
       setStudyRecords(data); // データを状態にセット
     }
@@ -30,24 +30,25 @@ export const App = () => {
     fetchStudyRecords();
   }, []);
 
+  const onRegister = () => {
+  if (title === "" || time === 0) {
+    setError("学習内容と学習時間は必須です。");
+    return;
+  }
 
-  const handleRegistration = async () => {
-    if (title === "" || time === 0) {
-      setError("学習内容と学習時間は必須です。");
-      return;
-    }
+  const newRecord = { title, time };
+  const data = insertStudyRecord(newRecord);
 
-    const newRecord = { title, time };
-    const data = await insertStudyRecord(newRecord);
-    if (data) {
-      setStudyRecords((prevRecords) => [...prevRecords, ...data]);
-      setTitle("");
-      setTime(0);
-      setError("");
-    } else {
-      setError("データの登録に失敗しました。");
-    }
-  };
+  if (data) {
+    console.log("データ登録成功:", data);  // 登録したデータを表示
+    fetchStudyRecords(); // 最新データを取得
+    setTitle(""); // フォームをリセット
+    setTime(0);
+    setError(""); // エラーをクリア
+  } else {
+    setError("データの登録に失敗しました。");
+  }
+};
 
   return (
     <BrowserRouter>
@@ -58,7 +59,7 @@ export const App = () => {
         error={error}
         onTitleChange={(e) => setTitle(e.target.value)}
         onTimeChange={(e) => setTime(Number(e.target.value))}
-        onRegister={handleRegistration}
+        onRegister={onRegister}
       />
 
       {isLoading ? (

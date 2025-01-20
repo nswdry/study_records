@@ -7,24 +7,26 @@ const supabase = createClient(
 );
 
 // Supabaseからデータを取得する
-export const  getStudyRecords = async () => {
-    const { data, error } = await supabase
-      .from("study-record")
-      .select("title, time");
+export const getStudyRecords = async () => {
+  const { data, error } = await supabase
+    .from("study-record")
+    .select("title, time");
 
-    if (error) {
-      console.error("Error fetching records:", error);
-      return null; 
-    }
-  return data; 
+  if (error) {
+    console.error("Error fetching records:", error);
+    return null;
+  }
+  return data;
 };
 
 // Supabaseにデータを追加する
 export const insertStudyRecord = async (record) => {
-  const { data, error } = await supabase.from("study-record").insert([record]);
+  const { data, error } = await supabase
+    .from("study-record")
+    .insert([record]);
 
   if (error) {
-    console.error("Error inserting record:", error);
+    console.error("Error inserting record:", error.message);  // エラーメッセージを表示
     return null;
   }
   return data;
